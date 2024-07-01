@@ -1,14 +1,15 @@
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, use_build_context_synchronously
 
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:studentprovider/common/style.dart';
 import 'package:studentprovider/model/student_model.dart';
 import 'package:studentprovider/provider/student_provider.dart';
 import 'package:studentprovider/provider/theme_provider.dart';
-import 'package:studentprovider/view/edit_screen.dart';
+
 import 'package:studentprovider/widgets/custom_textform.dart';
 
 class AddScreen extends StatelessWidget {
@@ -23,8 +24,6 @@ class AddScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ThemeProvider>(context);
-    final imageProvider = Provider.of<Imageprovider>(context);
-    // imageProvider.setImagePath(null);
 
     return Scaffold(
       backgroundColor:
@@ -36,7 +35,7 @@ class AddScreen extends StatelessWidget {
                   .setImagePath(null);
               Navigator.of(context).pop();
             },
-            icon: Icon(Icons.arrow_back_ios_new_rounded)),
+            icon: const Icon(Icons.arrow_back_ios_new_rounded)),
         backgroundColor: Colors.transparent,
         title: const Text('Add'),
         centerTitle: true,
@@ -46,6 +45,17 @@ class AddScreen extends StatelessWidget {
           padding: const EdgeInsets.all(20.0),
           child: Container(
             decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  provider.isDarkMode
+                      ?const  BoxShadow(color: Colors.transparent)
+                      : BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 2, 
+                          blurRadius: 7,
+                          offset:const  Offset(0, 3),
+                        )
+                ],
                 color: provider.isDarkMode ? Colors.grey[850] : Colors.white),
             child: Form(
               key: formKey,
@@ -119,11 +129,24 @@ class AddScreen extends StatelessWidget {
                       hintext: 'Phone no.',
                       labeltext: "Enter your phone no.",
                       controller: phoneController),
+                  const SizedBox(height: 10),
                   ElevatedButton(
                       onPressed: () async {
                         await addStudent(context);
                       },
-                      child: const Text('Add'))
+                      style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.grey[100],
+                          backgroundColor: provider.isDarkMode
+                              ? Colors.grey[700]
+                              : buttonColor,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20)),
+                          padding:const  EdgeInsets.only(
+                              left: 140, right: 140, top: 17, bottom: 17)),
+                      child: const Text('Add')),
+                  const SizedBox(
+                    height: 30,
+                  )
                 ],
               ),
             ),
@@ -150,7 +173,6 @@ class AddScreen extends StatelessWidget {
   }
 
   Future<void> pickImage(BuildContext context) async {
-    // Provider.of<Imageprovider>(context, listen: false).setImagePath(null);
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {

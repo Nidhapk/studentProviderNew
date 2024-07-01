@@ -12,6 +12,6 @@ class Kdivider extends StatelessWidget {
         thickness: 1,
         color: provider.isDarkMode
             ? Colors.grey
-            : Color.fromARGB(255, 137, 174, 201));
+            :const  Color.fromARGB(255, 137, 174, 201));
   }
 }

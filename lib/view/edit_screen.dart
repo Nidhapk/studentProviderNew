@@ -1,4 +1,4 @@
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, use_build_context_synchronously
 
 import 'dart:io';
 
@@ -15,20 +15,22 @@ class EditScreen extends StatelessWidget {
 
   EditScreen({super.key, required this.student});
 
-  // String? imagePath;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ThemeProvider>(context);
     final imageprovider = Provider.of<EditImageprovider>(context);
-    // final studentProvider = Provider.of<StudentProvider>(context);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (imageprovider.imagePath != student.photo) {
+        imageprovider.initializeImagePath(student.photo ?? '');
+      }
+    });
     final nameController = TextEditingController(text: student.studentName);
     final ageController = TextEditingController(text: student.age);
     final placeController = TextEditingController(text: student.place);
     final phoneController = TextEditingController(text: student.phoneNo);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      imageprovider.initializeImagePath(student.photo!);
-    });
+
     return Scaffold(
       backgroundColor:
           provider.isDarkMode ? Colors.transparent : Colors.blue[50],
@@ -62,7 +64,8 @@ class EditScreen extends StatelessWidget {
                         ),
                         child: Consumer<EditImageprovider>(
                             builder: (context, imageProvider, _) {
-                          return imageProvider._imagePath != null
+                          return imageProvider._imagePath != null &&
+                                  imageProvider._imagePath!.isNotEmpty
                               ? ClipOval(
                                   child: Image.file(
                                   File(imageProvider.imagePath!),
@@ -173,5 +176,6 @@ class EditImageprovider extends ChangeNotifier {
 
   void initializeImagePath(String path) {
     _imagePath = path;
+    notifyListeners();
   }
 }
